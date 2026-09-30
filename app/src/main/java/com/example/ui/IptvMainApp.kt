@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Schedule
@@ -75,7 +74,8 @@ import com.example.ui.theme.TextSecondary
 fun IptvMainApp(
     viewModel: MainViewModel
 ) {
-    val isArabic by viewModel.isArabic.collectAsStateWithLifecycle()
+    // Always use English (isArabic = false)
+    val isArabic = false
     val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
     val playingStream by viewModel.currentPlayingStream.collectAsStateWithLifecycle()
 
@@ -102,7 +102,7 @@ fun IptvMainApp(
     val isImporting by viewModel.isImporting.collectAsStateWithLifecycle()
 
     val strings = AppStrings.get(isArabic)
-    val layoutDirection = if (isArabic) LayoutDirection.Rtl else LayoutDirection.Ltr
+    val layoutDirection = LayoutDirection.Ltr  // Always LTR for English
 
     // Handle System Back button
     BackHandler(enabled = playingStream != null || currentScreen != AppNavScreen.LIVE_TV) {
@@ -188,23 +188,6 @@ fun IptvMainApp(
                                 // Quick Add Playlist
                                 IconButton(onClick = { viewModel.setAddPlaylistOpen(true) }) {
                                     Icon(Icons.Default.Add, contentDescription = "Add Playlist", tint = TextPrimary)
-                                }
-
-                                // Language Toggle
-                                IconButton(onClick = { viewModel.toggleLanguage(!isArabic) }) {
-                                    Surface(
-                                        shape = RoundedCornerShape(6.dp),
-                                        color = DarkSurfaceVariant,
-                                        modifier = Modifier.padding(2.dp)
-                                    ) {
-                                        Text(
-                                            text = if (isArabic) "EN" else "عربي",
-                                            color = TextPrimary,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                        )
-                                    }
                                 }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
