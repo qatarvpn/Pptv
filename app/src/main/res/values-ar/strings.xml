@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مشغل IPTV</string>
+    <string name="nav_live">بث مباشر</string>
+    <string name="nav_movies">أفلام</string>
+    <string name="nav_series">مسلسلات</string>
+    <string name="nav_epg">دليل البرامج</string>
+    <string name="nav_favorites">المفضلة</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="search_hint">ابحث عن القنوات، الأفلام، المسلسلات...</string>
+    <string name="add_playlist">إضافة قائمة تشغيل</string>
+    <string name="no_playlists">لا توجد قوائم تشغيل</string>
+    <string name="no_playlists_desc">قم بإضافة رابط M3U أو بيانات اشتراك Xtream Codes لبدء المشاهدة فوراً.</string>
+    <string name="load_sample_playlist">تحميل باقة تجريبية مجانية</string>
+    <string name="xtream_login">تسجيل دخول Xtream Codes</string>
+    <string name="server_url">رابط السيرفر (Server URL)</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="password">كلمة المرور</string>
+    <string name="playlist_name">اسم القائمة</string>
+    <string name="m3u_url">رابط قائمة M3U</string>
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="loading">جارٍ تحميل القنوات...</string>
+    <string name="play">تشغيل</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="favorite">المفضلة</string>
+    <string name="unfavorite">إزالة من المفضلة</string>
+    <string name="history">سجل المشاهدة</string>
+    <string name="all_categories">كل الفئات</string>
+</resources>

@@ -1,0 +1,6 @@
+{
+  "name": "IPTV Player",
+  "description": "Smart IPTV Player supporting M3U playlists, Xtream Codes API, Live TV, Movies, Series, and EPG Guide with picture-in-picture and multi-language support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
