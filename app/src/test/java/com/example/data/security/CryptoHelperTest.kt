@@ -1,8 +1,14 @@
 package com.example.data.security
 
+import android.os.Build
 import org.junit.Assert.*
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.P])
 class CryptoHelperTest {
 
     @Test
@@ -54,7 +60,6 @@ class CryptoHelperTest {
     @Test
     fun testDecryptOrNullWithInvalidData() {
         val result = CryptoHelper.decryptOrNull("invalid_data")
-        // Should return the original value on failure
         assertEquals("invalid_data", result)
     }
 }

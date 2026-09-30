@@ -81,6 +81,6 @@ http://example.com/stream2.m3u8
 """.byteInputStream()
 
         val result = M3uParser.parse(m3uContent, 1L)
-        assertEquals(2, result.size) // Orphan URL should be ignored
+        assertEquals(2, result.size)
     }
 }

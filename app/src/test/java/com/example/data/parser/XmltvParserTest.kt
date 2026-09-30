@@ -1,6 +1,5 @@
 package com.example.data.parser
 
-import com.example.data.local.EpgProgramEntity
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.ByteArrayInputStream
@@ -52,7 +51,7 @@ class XmltvParserTest {
 </tv>
 """
         val result = XmltvParser.parse(ByteArrayInputStream(xmlContent.toByteArray()))
-        assertEquals(0, result.size) // Should be skipped if no title
+        assertEquals(0, result.size)
     }
 
     @Test

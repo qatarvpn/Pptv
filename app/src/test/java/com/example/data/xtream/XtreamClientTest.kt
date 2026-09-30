@@ -1,30 +1,11 @@
 package com.example.data.xtream
 
+import com.example.data.local.StreamEntity
 import com.example.data.model.ChannelType
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 
 class XtreamClientTest {
-
-    private val client = XtreamClient()
-
-    @Test
-    fun testAuthenticateWithValidCredentials() = runTest {
-        // Note: This test would need mocking for real usage
-        // For now, we just test the data class structure
-        val result = XtreamClient.AuthResult(
-            success = true,
-            serverInfo = "http://xtream.server.com",
-            expiryDate = "2024-12-31",
-            maxConnections = "5"
-        )
-
-        assertTrue(result.success)
-        assertEquals("http://xtream.server.com", result.serverInfo)
-        assertEquals("2024-12-31", result.expiryDate)
-        assertEquals("5", result.maxConnections)
-    }
 
     @Test
     fun testAuthenticateFailure() {
@@ -40,7 +21,7 @@ class XtreamClientTest {
 
     @Test
     fun testStreamEntityCreation() {
-        val stream = com.example.data.local.StreamEntity(
+        val stream = StreamEntity(
             playlistId = 1L,
             streamId = "stream123",
             name = "Test Channel",
