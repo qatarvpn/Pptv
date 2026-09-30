@@ -35,23 +35,28 @@ class XtreamClient(
             val url = "$base/player_api.php?username=$user&password=$pass"
             val request = Request.Builder().url(url).build()
             val response = client.newCall(request).execute()
-            val body = response.body?.string() ?: return@withContext AuthResult(false, "Empty server response")
-
-            val json = JSONObject(body)
-            val userInfo = json.optJSONObject("user_info")
-            if (userInfo != null && userInfo.optString("auth") == "1" && userInfo.optString("status") == "Active") {
-                val serverInfo = json.optJSONObject("server_info")
-                val expDate = userInfo.optString("exp_date")
-                val maxConns = userInfo.optString("max_connections")
-                AuthResult(
-                    success = true,
-                    serverInfo = serverInfo?.optString("url") ?: base,
-                    expiryDate = expDate,
-                    maxConnections = maxConns
-                )
-            } else {
-                val msg = userInfo?.optString("message", "Authentication failed. Check credentials.") ?: "Invalid response"
-                AuthResult(false, msg)
+            
+            return@withContext try {
+                val body = response.body?.string() ?: return@withContext AuthResult(false, "Empty server response")
+                val json = JSONObject(body)
+                val userInfo = json.optJSONObject("user_info")
+                
+                if (userInfo != null && userInfo.optString("auth") == "1" && userInfo.optString("status") == "Active") {
+                    val serverInfo = json.optJSONObject("server_info")
+                    val expDate = userInfo.optString("exp_date")
+                    val maxConns = userInfo.optString("max_connections")
+                    AuthResult(
+                        success = true,
+                        serverInfo = serverInfo?.optString("url") ?: base,
+                        expiryDate = expDate,
+                        maxConnections = maxConns
+                    )
+                } else {
+                    val msg = userInfo?.optString("message", "Authentication failed. Check credentials.") ?: "Invalid response"
+                    AuthResult(false, msg)
+                }
+            } finally {
+                response.close()
             }
         } catch (e: Exception) {
             AuthResult(false, e.localizedMessage ?: "Connection error")
@@ -67,12 +72,12 @@ class XtreamClient(
         val base = sanitizeServerUrl(serverUrl)
         val result = mutableListOf<StreamEntity>()
 
-        // 1. Fetch live categories map
+        // Fetch category mappings for organizing streams
         val liveCatMap = fetchCategoriesMap(base, user, pass, "get_live_categories")
         val vodCatMap = fetchCategoriesMap(base, user, pass, "get_vod_categories")
         val seriesCatMap = fetchCategoriesMap(base, user, pass, "get_series_categories")
 
-        // 2. Fetch Live Streams
+        // Fetch Live Streams
         try {
             val liveUrl = "$base/player_api.php?username=$user&password=$pass&action=get_live_streams"
             val liveJson = fetchJsonArray(liveUrl)
@@ -99,9 +104,11 @@ class XtreamClient(
                     )
                 )
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            // Log or handle: Live streams fetch failed
+        }
 
-        // 3. Fetch VOD Movies
+        // Fetch VOD Movies
         try {
             val vodUrl = "$base/player_api.php?username=$user&password=$pass&action=get_vod_streams"
             val vodJson = fetchJsonArray(vodUrl)
@@ -129,9 +136,11 @@ class XtreamClient(
                     )
                 )
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            // Log or handle: VOD streams fetch failed
+        }
 
-        // 4. Fetch Series
+        // Fetch Series
         try {
             val seriesUrl = "$base/player_api.php?username=$user&password=$pass&action=get_series"
             val seriesJson = fetchJsonArray(seriesUrl)
@@ -145,7 +154,6 @@ class XtreamClient(
                 val rating = item.optString("rating").takeIf { it.isNotBlank() }
                 val plot = item.optString("plot").takeIf { it.isNotBlank() }
 
-                // Default series container item
                 val playUrl = "$base/series/$user/$pass/$seriesId.mp4"
                 result.add(
                     StreamEntity(
@@ -162,7 +170,9 @@ class XtreamClient(
                     )
                 )
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            // Log or handle: Series fetch failed
+        }
 
         result
     }
@@ -185,15 +195,21 @@ class XtreamClient(
                     map[id] = name
                 }
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            // Categories fetch failed - return empty map
+        }
         return map
     }
 
     private fun fetchJsonArray(url: String): JSONArray {
         val request = Request.Builder().url(url).build()
         val response = client.newCall(request).execute()
-        val body = response.body?.string() ?: "[]"
-        return JSONArray(body)
+        return try {
+            val body = response.body?.string() ?: "[]"
+            JSONArray(body)
+        } finally {
+            response.close()
+        }
     }
 
     private fun sanitizeServerUrl(raw: String): String {

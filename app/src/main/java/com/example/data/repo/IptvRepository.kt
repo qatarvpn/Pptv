@@ -11,6 +11,7 @@ import com.example.data.model.PlaylistType
 import com.example.data.model.StreamItem
 import com.example.data.parser.M3uParser
 import com.example.data.sample.SamplePlaylists
+import com.example.data.security.CryptoHelper
 import com.example.data.xtream.XtreamClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -116,12 +117,18 @@ class IptvRepository(
         try {
             val request = Request.Builder().url(url).build()
             val response = httpClient.newCall(request).execute()
+            
             if (!response.isSuccessful) {
+                response.close()
                 return@withContext Result.failure(Exception("HTTP Error: ${response.code}"))
             }
 
-            val bodyStream = response.body?.byteStream()
-                ?: return@withContext Result.failure(Exception("Empty playlist body"))
+            val bodyBytes = response.body?.bytes()
+            response.close()
+            
+            if (bodyBytes == null) {
+                return@withContext Result.failure(Exception("Empty playlist body"))
+            }
 
             val playlistEntity = PlaylistEntity(
                 name = name.ifBlank { "M3U Playlist" },
@@ -132,7 +139,7 @@ class IptvRepository(
             val playlistId = dao.insertPlaylist(playlistEntity)
             dao.setActivePlaylist(playlistId)
 
-            val parsedStreams = M3uParser.parse(bodyStream, playlistId)
+            val parsedStreams = M3uParser.parse(ByteArrayInputStream(bodyBytes), playlistId)
             dao.insertStreams(parsedStreams)
 
             val liveCount = parsedStreams.count { it.type == ChannelType.LIVE }
@@ -200,12 +207,15 @@ class IptvRepository(
                 return@withContext Result.failure(Exception(auth.message ?: "Authentication failed"))
             }
 
+            // Encrypt password before storing in database
+            val encryptedPassword = if (pass.isNotBlank()) CryptoHelper.encrypt(pass) else null
+            
             val playlistEntity = PlaylistEntity(
                 name = name.ifBlank { "Xtream Account" },
                 type = PlaylistType.XTREAM,
                 sourceUrl = serverUrl,
                 username = user,
-                password = pass,
+                password = encryptedPassword,
                 isActive = true
             )
             val playlistId = dao.insertPlaylist(playlistEntity)
@@ -239,7 +249,7 @@ class IptvRepository(
         type = type,
         sourceUrl = sourceUrl,
         username = username,
-        password = password,
+        password = CryptoHelper.decryptOrNull(password),
         channelCount = channelCount,
         movieCount = movieCount,
         seriesCount = seriesCount,

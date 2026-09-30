@@ -29,7 +29,8 @@ abstract class IptvDatabase : RoomDatabase() {
                     IptvDatabase::class.java,
                     "iptv_player_master.db"
                 )
-                    .fallbackToDestructiveMigration()
+                    // Note: REMOVED fallbackToDestructiveMigration()
+                    // Use proper migrations instead for production apps
                     .build()
                     .also { INSTANCE = it }
             }

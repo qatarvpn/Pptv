@@ -80,7 +80,6 @@ fun SettingsScreen(
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        // Title
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Settings, contentDescription = null, tint = PrimaryBlue, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(10.dp))
@@ -94,7 +93,6 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Language Switcher Section
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = DarkCard),
@@ -147,7 +145,6 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Playlists Management Section
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -288,7 +285,6 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Hardware & Player Info Section
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = DarkCard),
@@ -312,7 +308,8 @@ fun SettingsScreen(
 
                 SettingRowItem(title = "Engine", value = "AndroidX Media3 ExoPlayer 1.5.1")
                 SettingRowItem(title = "Protocols", value = "HLS (.m3u8), TS Streams, MP4, MKV")
-                SettingRowItem(title = "Cleartext Traffic", value = "Enabled (HTTP & HTTPS)")
+                SettingRowItem(title = "Cleartext Traffic", value = "Disabled (HTTPS only)")
+                SettingRowItem(title = "Credentials", value = "Encrypted (AES-GCM)")
                 SettingRowItem(title = "Picture-in-Picture", value = "Supported (PiP)")
             }
         }
