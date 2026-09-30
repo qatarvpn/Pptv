@@ -1,40 +1,55 @@
 package com.example
 
-import android.app.PictureInPictureParams
-import android.os.Build
 import android.os.Bundle
-import android.util.Rational
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.onboarding.OnboardingScreen
+import com.example.splash.SplashScreen
 import com.example.ui.IptvMainApp
 import com.example.ui.MainViewModel
+import com.example.ui.OnboardingViewModel
 import com.example.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
+    private lateinit var onboardingViewModel: OnboardingViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        onboardingViewModel = OnboardingViewModel(this)
+
         setContent {
             MyApplicationTheme {
-                IptvMainApp(viewModel = viewModel)
-            }
-        }
-    }
+                val hasCompletedOnboarding by onboardingViewModel.hasCompletedOnboarding.collectAsState()
+                var showSplash by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
 
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        if (viewModel.currentPlayingStream.value != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                val params = PictureInPictureParams.Builder()
-                    .setAspectRatio(Rational(16, 9))
-                    .build()
-                enterPictureInPictureMode(params)
-            } catch (_: Exception) { }
+                when {
+                    showSplash -> {
+                        SplashScreen(
+                            onSplashComplete = { showSplash = false }
+                        )
+                    }
+                    !hasCompletedOnboarding -> {
+                        OnboardingScreen(
+                            onCompleted = {
+                                onboardingViewModel.completeOnboarding()
+                            }
+                        )
+                    }
+                    else -> {
+                        IptvMainApp(viewModel = mainViewModel)
+                    }
+                }
+            }
         }
     }
 }
